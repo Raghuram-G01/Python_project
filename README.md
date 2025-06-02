@@ -1,4 +1,4 @@
-# 🤖 AI-Powered Blog Platform
+#  Blogspot Platform
 
 A modern, intelligent blogging platform that leverages artificial intelligence to enhance content creation, optimization, and user experience.
 
@@ -113,7 +113,10 @@ PINECONE_API_KEY=your-pinecone-api-key-here
 PINECONE_ENVIRONMENT=us-west1-gcp
 
 # Redis Configuration
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://localhost:6379/0![Screenshot 2025-06-02 013415](https://github.com/user-attachments/assets/5771f7ca-8dcf-45a3-b919-fd9ecb813191)
+![Uploading Screenshot 2025-06-02 013940.png…]()
+
+
 ```
 
 ## 🏗️ Architecture
