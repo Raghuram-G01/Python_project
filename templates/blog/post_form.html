@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Blog Spot{% endblock %}
+
+{% block extra_css %}
+<style>
+    .django-ckeditor-widget {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
+            <p class="text-gray-600">Share your thoughts and ideas with the world</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Basic Information -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        {{ form.content.label_tag }}
+                        {{ form.content }}
+                        {% if form.content.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.content.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        {{ form.excerpt.label_tag }}
+                        {{ form.excerpt }}
+                        {% if form.excerpt.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.excerpt.errors }}</div>
+                        {% endif %}
+                        <p class="text-sm text-gray-500 mt-1">Leave empty to auto-generate from content</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Featured Image</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        {{ form.featured_image.label_tag }}
+                        {{ form.featured_image }}
+                        {% if form.featured_image.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.featured_image.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.featured_image_alt.label_tag }}
+                        {{ form.featured_image_alt }}
+                        {% if form.featured_image_alt.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.featured_image_alt.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorization -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Categorization</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        {{ form.category.label_tag }}
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.tags.label_tag }}
+                        {{ form.tags }}
+                        {% if form.tags.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.tags.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publishing Options -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Publishing Options</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        {{ form.status.label_tag }}
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.status.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.is_featured }}
+                        <label for="{{ form.is_featured.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.is_featured.label }}
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.allow_comments }}
+                        <label for="{{ form.allow_comments.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                            {{ form.allow_comments.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO Settings -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">SEO Settings</h2>
+                <div class="space-y-4">
+                    <div>
+                        {{ form.meta_description.label_tag }}
+                        {{ form.meta_description }}
+                        {% if form.meta_description.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.meta_description.errors }}</div>
+                        {% endif %}
+                        <p class="text-sm text-gray-500 mt-1">Leave empty to auto-generate from excerpt</p>
+                    </div>
+                    <div>
+                        {{ form.meta_keywords.label_tag }}
+                        {{ form.meta_keywords }}
+                        {% if form.meta_keywords.errors %}
+                            <div class="text-red-600 text-sm mt-1">{{ form.meta_keywords.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                <button type="submit" name="save_draft" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                    <i class="fas fa-save mr-2"></i>Save as Draft
+                </button>
+                <button type="submit" name="publish" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    <i class="fas fa-paper-plane mr-2"></i>Publish Post
+                </button>
+                <a href="{% url 'blog:post_list' %}" class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 transition-colors font-semibold text-center">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-save functionality (optional)
+    let autoSaveTimer;
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    
+    function autoSave() {
+        // Implementation for auto-save functionality
+        console.log('Auto-saving...');
+    }
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(autoSave, 30000); // Auto-save after 30 seconds of inactivity
+        });
+    });
+</script>
+{% endblock %}

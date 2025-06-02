@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - Blog Spot{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-bg-business {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="business" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="%23f8fafc"/><circle cx="10" cy="10" r="2" fill="%236366f1" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23business)"/></svg>');
+        background-size: cover, 20px 20px;
+    }
+
+    .category-bg-food {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 101, 101, 0.1) 100%),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="food" patternUnits="userSpaceOnUse" width="15" height="15"><rect width="15" height="15" fill="%23fef2f2"/><path d="M7.5 3L9 6L7.5 9L6 6Z" fill="%23ef4444" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23food)"/></svg>');
+        background-size: cover, 15px 15px;
+    }
+
+    .category-bg-lifestyle {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="lifestyle" patternUnits="userSpaceOnUse" width="25" height="25"><rect width="25" height="25" fill="%23f0fdf4"/><circle cx="12.5" cy="12.5" r="3" fill="%2310b981" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23lifestyle)"/></svg>');
+        background-size: cover, 25px 25px;
+    }
+
+    .category-bg-technology {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tech" patternUnits="userSpaceOnUse" width="18" height="18"><rect width="18" height="18" fill="%23eff6ff"/><rect x="6" y="6" width="6" height="6" fill="%233b82f6" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23tech)"/></svg>');
+        background-size: cover, 18px 18px;
+    }
+
+    .category-bg-travel {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="travel" patternUnits="userSpaceOnUse" width="22" height="22"><rect width="22" height="22" fill="%23fffbeb"/><polygon points="11,5 13,9 17,9 14,12 15,16 11,14 7,16 8,12 5,9 9,9" fill="%23f59e0b" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23travel)"/></svg>');
+        background-size: cover, 22px 22px;
+    }
+
+    .category-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: inherit;
+        opacity: 0.7;
+        z-index: -1;
+    }
+
+    .category-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .category-card:hover::before {
+        opacity: 0.9;
+    }
+
+    .floating-icon {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .page-background {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .page-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" patternUnits="userSpaceOnUse" width="10" height="10"><rect width="10" height="10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-background">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg mb-6">
+                <i class="fas fa-th-large text-3xl text-white"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">Explore Categories</h1>
+            <p class="text-xl text-white text-opacity-90 max-w-2xl mx-auto">
+                Discover content across different topics and find what interests you most
+            </p>
+        </div>
+
+        <!-- Categories Grid -->
+        {% if categories %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for category in categories %}
+                <a href="{% url 'blog:category_posts' category.slug %}" class="group">
+                    <div class="category-card rounded-xl shadow-lg p-8 border-l-4
+                        {% if category.name|lower == 'business' %}category-bg-business
+                        {% elif category.name|lower == 'food' %}category-bg-food
+                        {% elif category.name|lower == 'lifestyle' %}category-bg-lifestyle
+                        {% elif category.name|lower == 'technology' %}category-bg-technology
+                        {% elif category.name|lower == 'travel' %}category-bg-travel
+                        {% else %}category-bg-business{% endif %}"
+                        style="border-left-color: {{ category.color }};">
+
+                        <!-- Category Header -->
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center mr-4 floating-icon"
+                                 style="background: linear-gradient(135deg, {{ category.color }}20, {{ category.color }}40);">
+                                {% if category.icon %}
+                                    <i class="{{ category.icon }} text-2xl" style="color: {{ category.color }};"></i>
+                                {% else %}
+                                    <i class="fas fa-folder text-2xl" style="color: {{ category.color }};"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
+                                    {{ category.name }}
+                                </h3>
+                                {% if category.is_featured %}
+                                    <span class="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                                        ✨ Featured
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Category Description -->
+                        {% if category.description %}
+                            <p class="text-gray-700 mb-6 leading-relaxed">{{ category.description }}</p>
+                        {% endif %}
+
+                        <!-- Category Stats -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm font-medium" style="color: {{ category.color }};">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                <span>{{ category.post_count }} post{{ category.post_count|pluralize }}</span>
+                            </div>
+                            <div class="text-gray-600 group-hover:text-blue-600 transition-colors">
+                                <i class="fas fa-arrow-right text-lg"></i>
+                            </div>
+                        </div>
+
+                        <!-- Decorative Elements -->
+                        <div class="absolute top-4 right-4 opacity-20">
+                            {% if category.icon %}
+                                <i class="{{ category.icon }} text-4xl" style="color: {{ category.color }};"></i>
+                            {% else %}
+                                <i class="fas fa-folder text-4xl" style="color: {{ category.color }};"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-8 max-w-md mx-auto">
+                    <i class="fas fa-folder-open text-6xl text-white text-opacity-60 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-white mb-2">No categories available</h3>
+                    <p class="text-white text-opacity-80">Categories will appear here once they are created.</p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Call to Action -->
+        <div class="mt-16 text-center">
+            <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl p-8 text-white border border-white border-opacity-20">
+                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-pen-fancy text-2xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">Want to contribute?</h2>
+                <p class="text-white text-opacity-90 mb-6 max-w-md mx-auto">
+                    Join our community of writers and share your knowledge with the world
+                </p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'blog:create_post' %}" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Start Writing
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:register' %}" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-user-plus mr-2"></i>Join Us
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add staggered animation to category cards
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-fadeInUp');
+    });
+});
+</script>
+
+<style>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+</style>
+{% endblock %}

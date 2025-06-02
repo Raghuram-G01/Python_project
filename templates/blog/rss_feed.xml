@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>{{ site_name }}</title>
+        <link>https://{{ domain }}</link>
+        <description>{{ site_description }}</description>
+        <language>en-us</language>
+        <lastBuildDate>{% now "r" %}</lastBuildDate>
+        
+        {% for post in posts %}
+        <item>
+            <title>{{ post.title }}</title>
+            <link>https://{{ domain }}{{ post.get_absolute_url }}</link>
+            <description>{{ post.excerpt|escape }}</description>
+            <author>{{ post.author.email }} ({{ post.author.get_full_name|default:post.author.username }})</author>
+            <pubDate>{{ post.published_at|date:"r" }}</pubDate>
+            <guid>https://{{ domain }}{{ post.get_absolute_url }}</guid>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>

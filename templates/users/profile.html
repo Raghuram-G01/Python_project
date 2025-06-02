@@ -1,0 +1,624 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} - Blog Spot{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        background: white;
+        border-right: 1px solid #e2e8f0;
+        min-height: 100vh;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .tab-button {
+        padding: 12px 24px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+        border-bottom-color: #3b82f6;
+        color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .activity-item {
+        border-left: 3px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        border-left-color: #3b82f6;
+        background: #f8fafc;
+    }
+
+    .priority-high { color: #ef4444; }
+    .priority-medium { color: #f59e0b; }
+    .priority-low { color: #10b981; }
+
+    .status-published { background: #dcfce7; color: #166534; }
+    .status-draft { background: #fef3c7; color: #92400e; }
+    .status-archived { background: #f3f4f6; color: #374151; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 p-6">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-blog text-white text-sm"></i>
+                    </div>
+                    <span class="font-bold text-gray-900">Blog Spot</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="space-y-2">
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Workspace</div>
+                <a href="#overview" onclick="showSection('overview')" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#posts" onclick="showSection('posts')" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-file-alt w-5"></i>
+                    <span>Posts</span>
+                </a>
+                <a href="#activity" onclick="showSection('activity')" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-clock w-5"></i>
+                    <span>Activity</span>
+                </a>
+                <a href="#analytics" onclick="showSection('analytics')" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span>Analytics</span>
+                </a>
+
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 mt-6">Resources</div>
+                <a href="{% url 'blog:home' %}" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'blog:create_post' %}" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-plus w-5"></i>
+                    <span>Create Post</span>
+                </a>
+                {% if is_own_profile %}
+                <a href="{% url 'users:profile_edit' %}" class="nav-link flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-cog w-5"></i>
+                    <span>Settings</span>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ profile_user.get_full_name|default:profile_user.username }}</h1>
+                        <p class="text-gray-600">{{ profile_user.email }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    {% if not is_own_profile %}
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-user-plus mr-2"></i>Follow
+                    </button>
+                    <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-envelope mr-2"></i>Message
+                    </button>
+                    {% else %}
+                    <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Create
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Profile Card -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+                <div class="flex items-start space-x-6">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
+                        {% else %}
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-2 border-gray-200">
+                                <span class="text-white font-bold text-xl">{{ profile_user.username|first|upper }}</span>
+                            </div>
+                        {% endif %}
+                        <div class="w-4 h-4 bg-green-400 rounded-full border-2 border-white absolute ml-14 -mt-4"></div>
+                    </div>
+
+                    <!-- Profile Info -->
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h2 class="text-xl font-bold text-gray-900">{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+                            <span class="text-gray-500">{{ profile_user.email }}</span>
+                        </div>
+
+                        <!-- Profile Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                            <!-- About -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 mb-3">About</h3>
+                                <div class="space-y-2 text-sm text-gray-600">
+                                    {% if profile.bio %}
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-user text-gray-400"></i>
+                                        <span>{{ profile.bio|truncatewords:10 }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if profile.location %}
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                        <span>{{ profile.location }}</span>
+                                    </div>
+                                    {% endif %}
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-calendar text-gray-400"></i>
+                                        <span>Joined {{ profile_user.date_joined|date:"M Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Company/Stats -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 mb-3">Statistics</h3>
+                                <div class="space-y-2 text-sm text-gray-600">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-file-alt text-gray-400"></i>
+                                        <span>{{ post_stats.total_posts }} Posts</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-eye text-gray-400"></i>
+                                        <span>{{ post_stats.total_views }} Views</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-heart text-gray-400"></i>
+                                        <span>{{ post_stats.total_likes }} Likes</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 mb-3">Social</h3>
+                                <div class="space-y-2 text-sm">
+                                    {% if profile.twitter_username %}
+                                    <a href="https://twitter.com/{{ profile.twitter_username }}" target="_blank" class="flex items-center space-x-2 text-blue-600 hover:text-blue-700">
+                                        <i class="fab fa-twitter text-gray-400"></i>
+                                        <span>@{{ profile.twitter_username }}</span>
+                                    </a>
+                                    {% endif %}
+                                    {% if profile.github_username %}
+                                    <a href="https://github.com/{{ profile.github_username }}" target="_blank" class="flex items-center space-x-2 text-gray-600 hover:text-gray-700">
+                                        <i class="fab fa-github text-gray-400"></i>
+                                        <span>@{{ profile.github_username }}</span>
+                                    </a>
+                                    {% endif %}
+                                    {% if profile.linkedin_username %}
+                                    <a href="https://linkedin.com/in/{{ profile.linkedin_username }}" target="_blank" class="flex items-center space-x-2 text-blue-600 hover:text-blue-700">
+                                        <i class="fab fa-linkedin text-gray-400"></i>
+                                        <span>@{{ profile.linkedin_username }}</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="bg-white rounded-lg shadow-sm mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="flex space-x-8 px-6">
+                        <button onclick="showSection('overview')" class="tab-button active" id="overview-tab">
+                            <i class="fas fa-chart-line mr-2"></i>Overview
+                        </button>
+                        <button onclick="showSection('posts')" class="tab-button" id="posts-tab">
+                            <i class="fas fa-file-alt mr-2"></i>Posts & Projects
+                        </button>
+                        <button onclick="showSection('activity')" class="tab-button" id="activity-tab">
+                            <i class="fas fa-clock mr-2"></i>Activity & Schedule
+                        </button>
+                        <button onclick="showSection('analytics')" class="tab-button" id="analytics-tab">
+                            <i class="fas fa-chart-bar mr-2"></i>Analytics
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div id="overview-section" class="section-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Generated Revenue -->
+                    <div class="stat-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Views</p>
+                                <p class="text-2xl font-bold text-gray-900">${{ post_stats.total_views|default:"0" }}</p>
+                                <p class="text-xs text-gray-500">This Month - Last Month</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex space-x-2 text-xs">
+                                    <span class="text-gray-400">D</span>
+                                    <span class="text-gray-400">W</span>
+                                    <span class="text-blue-600 font-medium">M</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            <span class="text-sm">+12.5%</span>
+                        </div>
+                    </div>
+
+                    <!-- Projects Completed -->
+                    <div class="stat-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Posts Published</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ post_stats.total_posts|default:"0" }}</p>
+                                <p class="text-xs text-gray-500">This Month - Last Month</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex space-x-2 text-xs">
+                                    <span class="text-gray-400">D</span>
+                                    <span class="text-gray-400">W</span>
+                                    <span class="text-blue-600 font-medium">M</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span class="text-sm">+8.2%</span>
+                        </div>
+                    </div>
+
+                    <!-- Helped Users -->
+                    <div class="stat-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Likes</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ post_stats.total_likes|default:"0" }}</p>
+                                <p class="text-xs text-gray-500">This Month - Last Month</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex space-x-2 text-xs">
+                                    <span class="text-gray-400">D</span>
+                                    <span class="text-gray-400">W</span>
+                                    <span class="text-blue-600 font-medium">M</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-green-600">
+                            <i class="fas fa-heart mr-1"></i>
+                            <span class="text-sm">+15.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Section -->
+            <div id="posts-section" class="section-content hidden">
+                <div class="bg-white rounded-lg shadow-sm">
+                    <!-- Posts Header -->
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <input type="text" placeholder="Search for anything..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                <button class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-filter"></i>
+                                    <span>Filter</span>
+                                </button>
+                                <button class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-sort"></i>
+                                    <span>Sort</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    <i class="fas fa-plus mr-2"></i>New Post
+                                </button>
+                                <button class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-download mr-2"></i>Export
+                                </button>
+                                <button class="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-th mr-2"></i>Layout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Posts Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <input type="checkbox" class="rounded border-gray-300">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Post <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Author <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Priority <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Category <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Last Updated <i class="fas fa-sort ml-1"></i>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for post in page_obj %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-gray-300">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-8 w-8">
+                                                {% if post.featured_image %}
+                                                    <img class="h-8 w-8 rounded object-cover" src="{{ post.featured_image.url }}" alt="">
+                                                {% else %}
+                                                    <div class="h-8 w-8 rounded bg-gray-200 flex items-center justify-center">
+                                                        <i class="fas fa-file-alt text-gray-400 text-sm"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">{{ post.title|truncatechars:30 }}</div>
+                                                <div class="text-sm text-gray-500">#{{ post.id }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            {% if post.author.profile.avatar %}
+                                                <img class="h-6 w-6 rounded-full" src="{{ post.author.profile.avatar.url }}" alt="">
+                                            {% else %}
+                                                <div class="h-6 w-6 rounded-full bg-gray-300 flex items-center justify-center">
+                                                    <span class="text-xs text-gray-600">{{ post.author.username|first|upper }}</span>
+                                                </div>
+                                            {% endif %}
+                                            <span class="ml-2 text-sm text-gray-900">{{ post.author.get_full_name|default:post.author.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="priority-medium">
+                                            <i class="fas fa-circle text-xs mr-1"></i>Medium
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full status-{{ post.status }}">
+                                            {{ post.status|title }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {% if post.category %}
+                                            <span class="flex items-center">
+                                                <i class="fas fa-tag text-gray-400 mr-1"></i>
+                                                {{ post.category.name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-gray-400">Uncategorized</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ post.updated_at|date:"m/d/y" }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center space-x-2">
+                                            <a href="{% url 'blog:post_detail' post.slug %}" class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                            <a href="{% url 'blog:post_detail' post.slug %}" class="text-gray-600 hover:text-gray-900">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="text-gray-600 hover:text-gray-900">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center">
+                                        <div class="text-gray-500">
+                                            <i class="fas fa-file-alt text-4xl mb-4"></i>
+                                            <p class="text-lg font-medium">No posts yet</p>
+                                            <p class="text-sm">Start creating your first blog post!</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Section -->
+            <div id="activity-section" class="section-content hidden">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
+                    <div class="space-y-4">
+                        {% for post in page_obj|slice:":5" %}
+                        <div class="activity-item pl-4 py-3 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0">
+                                        {% if post.author.profile.avatar %}
+                                            <img class="h-8 w-8 rounded-full" src="{{ post.author.profile.avatar.url }}" alt="">
+                                        {% else %}
+                                            <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                                <span class="text-xs text-gray-600">{{ post.author.username|first|upper }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{ post.title|truncatechars:50 }}</p>
+                                        <p class="text-xs text-gray-500">{{ post.status|title }} • {{ post.updated_at|timesince }} ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="priority-medium">
+                                        <i class="fas fa-circle text-xs"></i>
+                                    </span>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full status-{{ post.status }}">
+                                        {{ post.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-12">
+                            <i class="fas fa-clock text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No recent activity</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="section-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Performance Chart -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Performance Overview</h3>
+                        <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                            <div class="text-center">
+                                <i class="fas fa-chart-line text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500">Analytics chart would go here</p>
+                                <p class="text-sm text-gray-400">Integration with analytics service needed</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Posts -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Performing Posts</h3>
+                        <div class="space-y-3">
+                            {% for post in page_obj|slice:":3" %}
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    {% if post.featured_image %}
+                                        <img class="h-10 w-10 rounded object-cover" src="{{ post.featured_image.url }}" alt="">
+                                    {% else %}
+                                        <div class="h-10 w-10 rounded bg-gray-200 flex items-center justify-center">
+                                            <i class="fas fa-file-alt text-gray-400"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{ post.title|truncatechars:30 }}</p>
+                                        <p class="text-xs text-gray-500">{{ post.view_count }} views</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-green-600">+{{ post.like_count }}</p>
+                                    <p class="text-xs text-gray-500">likes</p>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-8">
+                                <i class="fas fa-chart-bar text-3xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-500">No posts to analyze yet</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showSection(sectionName) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.section-content');
+    sections.forEach(section => {
+        section.classList.add('hidden');
+    });
+
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Show selected section
+    document.getElementById(sectionName + '-section').classList.remove('hidden');
+
+    // Add active class to selected tab
+    document.getElementById(sectionName + '-tab').classList.add('active');
+
+    // Update sidebar navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.classList.remove('bg-blue-100', 'text-blue-700');
+        link.classList.add('text-gray-700');
+    });
+
+    // Highlight active nav item
+    const activeNavLink = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+    if (activeNavLink) {
+        activeNavLink.classList.remove('text-gray-700');
+        activeNavLink.classList.add('bg-blue-100', 'text-blue-700');
+    }
+}
+
+// Initialize with overview section
+document.addEventListener('DOMContentLoaded', function() {
+    showSection('overview');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog Spot - Share Your Stories{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-pattern {
+        background-image:
+            radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    }
+
+    .floating-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .slide-up {
+        animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stats-counter {
+        font-variant-numeric: tabular-nums;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white py-24 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 hero-pattern"></div>
+
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 floating-animation">
+        <div class="w-20 h-20 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-pen-fancy text-2xl"></i>
+        </div>
+    </div>
+    <div class="absolute top-40 right-20 floating-animation" style="animation-delay: -2s;">
+        <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-lightbulb text-xl"></i>
+        </div>
+    </div>
+    <div class="absolute bottom-20 left-20 floating-animation" style="animation-delay: -4s;">
+        <div class="w-12 h-12 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-heart text-sm"></i>
+        </div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center slide-up">
+            <!-- Main Heading -->
+            <div class="mb-8">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Share Your
+                    <span class="block gradient-text bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
+                        Stories
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-4 text-blue-100 max-w-3xl mx-auto leading-relaxed">
+                    Join our community of writers and readers. Discover amazing content, share your thoughts, and connect with like-minded people.
+                </p>
+                <p class="text-lg text-blue-200 mb-8">
+                    ✨ Write • 📖 Read • 💬 Connect • 🚀 Grow
+                </p>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'blog:create_post' %}" class="group bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-pen mr-2 group-hover:animate-pulse"></i>Start Writing
+                    </a>
+                    <a href="{% url 'users:profile' user.username %}" class="border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-blue-600 transition-all transform hover:scale-105">
+                        <i class="fas fa-user mr-2"></i>My Profile
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:register' %}" class="group bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-rocket mr-2 group-hover:animate-bounce"></i>Get Started Free
+                    </a>
+                    <a href="{% url 'users:login' %}" class="border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-blue-600 transition-all transform hover:scale-105">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold stats-counter">{{ total_posts|default:"50" }}+</div>
+                    <div class="text-blue-200 text-sm md:text-base">Articles</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold stats-counter">{{ total_users|default:"1.2" }}K+</div>
+                    <div class="text-blue-200 text-sm md:text-base">Writers</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold stats-counter">{{ total_views|default:"25" }}K+</div>
+                    <div class="text-blue-200 text-sm md:text-base">Readers</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold stats-counter">{{ total_categories|default:"12" }}+</div>
+                    <div class="text-blue-200 text-sm md:text-base">Categories</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wave Separator -->
+    <div class="absolute bottom-0 left-0 w-full">
+        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
+        </svg>
+    </div>
+</section>
+
+<!-- Featured Categories -->
+{% if featured_categories %}
+<section class="py-20 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 mb-6 shadow-lg">
+                <i class="fas fa-th-large text-3xl text-white"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Explore <span class="gradient-text">Categories</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Discover amazing content across different topics and find what sparks your curiosity
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for category in featured_categories %}
+            <a href="{% url 'blog:category_posts' category.slug %}" class="group card-hover">
+                <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg p-8 border border-gray-100 relative overflow-hidden">
+                    <!-- Background Decoration -->
+                    <div class="absolute top-0 right-0 w-32 h-32 opacity-5">
+                        <div class="w-full h-full rounded-full" style="background: {{ category.color }};"></div>
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mr-4 shadow-lg"
+                                 style="background: linear-gradient(135deg, {{ category.color }}15, {{ category.color }}25);">
+                                {% if category.icon %}
+                                    <i class="{{ category.icon }} text-2xl" style="color: {{ category.color }};"></i>
+                                {% else %}
+                                    <i class="fas fa-folder text-2xl" style="color: {{ category.color }};"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    {{ category.name }}
+                                </h3>
+                                <p class="text-sm text-gray-500">{{ category.post_count }} article{{ category.post_count|pluralize }}</p>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            {{ category.description|truncatewords:20 }}
+                        </p>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm font-semibold" style="color: {{ category.color }};">
+                                <i class="fas fa-arrow-right mr-2 group-hover:translate-x-1 transition-transform"></i>
+                                <span>Explore {{ category.name }}</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                                <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- View All Categories Button -->
+        <div class="text-center mt-16">
+            <a href="{% url 'blog:category_list' %}" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-th-large mr-3"></i>
+                View All Categories
+                <i class="fas fa-arrow-right ml-3"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Why Choose <span class="gradient-text">Blog Spot</span>?
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Everything you need to share your stories and build your audience
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="text-center card-hover bg-white rounded-2xl p-8 shadow-lg">
+                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <i class="fas fa-pen-fancy text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Easy Writing</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Intuitive editor with rich formatting options. Focus on your content while we handle the rest.
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="text-center card-hover bg-white rounded-2xl p-8 shadow-lg">
+                <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <i class="fas fa-users text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Community</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Connect with fellow writers and readers. Build meaningful relationships through shared interests.
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="text-center card-hover bg-white rounded-2xl p-8 shadow-lg">
+                <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <i class="fas fa-chart-line text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Analytics</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Track your content performance with detailed insights and grow your audience effectively.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Posts -->
+{% if featured_posts %}
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 mb-6 shadow-lg">
+                <i class="fas fa-star text-3xl text-white"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Featured <span class="gradient-text">Stories</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Hand-picked articles from our talented community of writers
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in featured_posts %}
+            <article class="group card-hover bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                {% if post.featured_image %}
+                <div class="relative overflow-hidden">
+                    <img src="{{ post.featured_image.url }}" alt="{{ post.featured_image_alt|default:post.title }}"
+                         class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    {% if post.category %}
+                    <div class="absolute top-4 left-4">
+                        <span class="px-3 py-1 text-xs font-bold rounded-full text-white shadow-lg"
+                              style="background: {{ post.category.color }};">
+                            {{ post.category.name }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="p-8">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                    </h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">{{ post.excerpt|truncatewords:25 }}</p>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            {% if post.author.profile.avatar %}
+                                <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}"
+                                     class="w-10 h-10 rounded-full mr-3 border-2 border-gray-100">
+                            {% else %}
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center mr-3">
+                                    <span class="text-white font-bold text-sm">{{ post.author.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">{{ post.author.get_full_name|default:post.author.username }}</p>
+                                <p class="text-xs text-gray-500">{{ post.published_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                            <span class="flex items-center">
+                                <i class="fas fa-eye mr-1"></i>{{ post.view_count }}
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fas fa-heart mr-1"></i>{{ post.like_count }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-16">
+            <a href="{% url 'blog:post_list' %}" class="inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg">
+                <i class="fas fa-book-open mr-3"></i>
+                View All Posts
+                <i class="fas fa-arrow-right ml-3"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Recent Posts -->
+{% if recent_posts %}
+<section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 mb-6 shadow-lg">
+                <i class="fas fa-clock text-3xl text-white"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Latest <span class="gradient-text">Updates</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Fresh content from our community of passionate writers
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for post in recent_posts %}
+            <article class="group card-hover bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                <div class="flex">
+                    {% if post.featured_image %}
+                    <div class="flex-shrink-0 relative overflow-hidden">
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.featured_image_alt|default:post.title }}"
+                             class="w-40 h-40 object-cover group-hover:scale-105 transition-transform duration-300">
+                        {% if post.category %}
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 text-xs font-bold rounded-lg text-white shadow-lg"
+                                  style="background: {{ post.category.color }};">
+                                {{ post.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-1 p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">{{ post.excerpt|truncatewords:20 }}</p>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                {% if post.author.profile.avatar %}
+                                    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}"
+                                         class="w-8 h-8 rounded-full mr-2 border border-gray-200">
+                                {% else %}
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center mr-2">
+                                        <span class="text-white font-bold text-xs">{{ post.author.username|first|upper }}</span>
+                                    </div>
+                                {% endif %}
+                                <span class="text-sm font-medium text-gray-700">{{ post.author.get_full_name|default:post.author.username }}</span>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ post.published_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Newsletter Signup -->
+<section class="relative py-20 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 hero-pattern"></div>
+
+    <!-- Floating Elements -->
+    <div class="absolute top-10 left-10 floating-animation">
+        <div class="w-16 h-16 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-envelope text-xl text-white"></i>
+        </div>
+    </div>
+    <div class="absolute bottom-10 right-10 floating-animation" style="animation-delay: -3s;">
+        <div class="w-12 h-12 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-bell text-sm text-white"></i>
+        </div>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white bg-opacity-20 mb-6 shadow-lg">
+                <i class="fas fa-paper-plane text-3xl text-white"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                Stay in the <span class="gradient-text bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">Loop</span>
+            </h2>
+            <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Join thousands of readers and get the latest stories, insights, and updates delivered straight to your inbox
+            </p>
+        </div>
+
+        <form method="post" action="{% url 'users:newsletter_subscribe' %}" class="max-w-lg mx-auto">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="email" name="email" placeholder="Enter your email address" required
+                       class="flex-1 px-6 py-4 rounded-xl border-0 focus:ring-4 focus:ring-white focus:ring-opacity-30 focus:outline-none text-gray-900 placeholder-gray-500 shadow-lg">
+                <button type="submit" class="bg-white text-blue-600 px-8 py-4 rounded-xl hover:bg-blue-50 transition-all transform hover:scale-105 font-bold text-lg shadow-lg">
+                    <i class="fas fa-rocket mr-2"></i>Subscribe Free
+                </button>
+            </div>
+            <p class="text-blue-200 text-sm mt-4">
+                ✨ No spam, unsubscribe at any time. Join 10,000+ happy readers!
+            </p>
+        </form>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Ready to Share Your <span class="gradient-text">Story</span>?
+        </h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Join our community of writers and start sharing your unique perspective with the world
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if user.is_authenticated %}
+                <a href="{% url 'blog:create_post' %}" class="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-pen mr-2 group-hover:animate-pulse"></i>Write Your First Post
+                </a>
+                <a href="{% url 'users:profile' user.username %}" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-blue-600 hover:text-blue-600 transition-all">
+                    <i class="fas fa-user mr-2"></i>View My Profile
+                </a>
+            {% else %}
+                <a href="{% url 'users:register' %}" class="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-rocket mr-2 group-hover:animate-bounce"></i>Join Blog Spot
+                </a>
+                <a href="{% url 'blog:post_list' %}" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-bold text-lg hover:border-blue-600 hover:text-blue-600 transition-all">
+                    <i class="fas fa-book-open mr-2"></i>Explore Posts
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

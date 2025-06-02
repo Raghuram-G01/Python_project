@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog Spot - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="ai-gradient text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                Welcome to the Future of
+                <span class="typing-animation">Blogging</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-200">
+                Experience AI-powered content creation, intelligent search, and personalized recommendations
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'blog:post_list' %}"
+                   class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Explore Posts
+                </a>
+                <a href="#"
+                   class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
+                    Try AI Writer
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI Features Showcase -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">AI-Powered Features</h2>
+            <p class="text-xl text-gray-600">Discover how artificial intelligence enhances your blogging experience</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-magic text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">AI Content Generation</h3>
+                <p class="text-gray-600">Generate high-quality blog posts with AI assistance</p>
+            </div>
+
+            <div class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-compress-alt text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Smart Summarization</h3>
+                <p class="text-gray-600">Automatically generate summaries for your content</p>
+            </div>
+
+            <div class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-search text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Semantic Search</h3>
+                <p class="text-gray-600">Find content using natural language queries</p>
+            </div>
+
+            <div class="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-chart-line text-2xl text-primary-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">SEO Optimization</h3>
+                <p class="text-gray-600">AI-powered SEO analysis and recommendations</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Posts -->
+{% if featured_posts %}
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">Featured Posts</h2>
+            <a href="{% url 'blog:post_list' %}" class="text-primary-600 hover:text-primary-700 font-semibold">
+                View All Posts <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in featured_posts %}
+            <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div class="p-6">
+                    <div class="flex items-center mb-3">
+                        {% if post.ai_generated %}
+                        <span class="bg-primary-100 text-primary-800 text-xs font-semibold px-2 py-1 rounded-full mr-2">
+                            <i class="fas fa-robot mr-1"></i>AI Generated
+                        </span>
+                        {% endif %}
+                        {% if post.category %}
+                        <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">
+                            {{ post.category.name }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-2 hover:text-primary-600 transition-colors">
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                    </h3>
+
+                    <p class="text-gray-600 mb-4">
+                        {{ post.ai_summary|default:post.excerpt|truncatewords:20 }}
+                    </p>
+
+                    <div class="flex items-center justify-between text-sm text-gray-500">
+                        <div class="flex items-center space-x-4">
+                            <span><i class="fas fa-user mr-1"></i>{{ post.author.username }}</span>
+                            <span><i class="fas fa-calendar mr-1"></i>{{ post.published_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span><i class="fas fa-eye mr-1"></i>{{ post.view_count }}</span>
+                            <span><i class="fas fa-heart mr-1"></i>{{ post.like_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Personalized Recommendations -->
+{% if user.is_authenticated and recommended_posts %}
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center mb-8">
+            <div class="bg-primary-100 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                <i class="fas fa-user-cog text-primary-600"></i>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">Recommended for You</h2>
+                <p class="text-gray-600">AI-curated content based on your reading history</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for post in recommended_posts %}
+            <article class="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors">
+                <h3 class="text-lg font-semibold mb-2 hover:text-primary-600 transition-colors">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                <p class="text-gray-600 text-sm mb-3">
+                    {{ post.ai_summary|default:post.excerpt|truncatewords:15 }}
+                </p>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>{{ post.author.username }}</span>
+                    <span>{{ post.published_at|date:"M d" }}</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Popular Posts -->
+{% if popular_posts %}
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Trending Posts</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for post in popular_posts %}
+            <article class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start space-x-4">
+                    <div class="bg-primary-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                        {{ forloop.counter }}
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold mb-2 hover:text-primary-600 transition-colors">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                            <span><i class="fas fa-eye mr-1"></i>{{ post.view_count }}</span>
+                            <span><i class="fas fa-heart mr-1"></i>{{ post.like_count }}</span>
+                            <span><i class="fas fa-comments mr-1"></i>{{ post.comment_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="py-16 bg-primary-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Experience AI-Powered Blogging?</h2>
+        <p class="text-xl mb-8 text-primary-100">
+            Join thousands of writers who are already using AI to enhance their content
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if not user.is_authenticated %}
+            <a href="{% url 'blog:register' %}"
+               class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                Get Started Free
+            </a>
+            {% else %}
+            <a href="{% url 'blog:create_post' %}"
+               class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                Create Your First AI Post
+            </a>
+            {% endif %}
+            <a href="#"
+               class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">
+                Try AI Writer
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Typing animation for hero text
+    const typingElement = document.querySelector('.typing-animation');
+    const words = ['Blogging', 'Writing', 'Content Creation', 'Storytelling'];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function typeWriter() {
+        const currentWord = words[wordIndex];
+
+        if (isDeleting) {
+            typingElement.textContent = currentWord.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            typingElement.textContent = currentWord.substring(0, charIndex + 1);
+            charIndex++;
+        }
+
+        if (!isDeleting && charIndex === currentWord.length) {
+            setTimeout(() => isDeleting = true, 2000);
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            wordIndex = (wordIndex + 1) % words.length;
+        }
+
+        const speed = isDeleting ? 50 : 100;
+        setTimeout(typeWriter, speed);
+    }
+
+    // Start typing animation
+    setTimeout(typeWriter, 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+# Core Django Framework (Compatible with Djongo)
+Django==4.1.13
+djangorestframework==3.14.0
+
+# Database - MongoDB with Djongo
+pymongo==3.12.3
+djongo==1.3.6
+dnspython==2.4.2
+
+# Rich Text Editor
+django-ckeditor==6.7.0
+markdown==3.5.1
+django-markdownx==4.0.2
+
+# Image Handling
+Pillow==10.1.0
+django-imagekit==4.1.0
+
+# Forms and UI
+django-widget-tweaks==1.5.0
+django-crispy-forms==1.14.0
+crispy-tailwind==0.5.0
+
+# Tagging System
+django-taggit==4.0.0
+
+# URL Slugs
+python-slugify==8.0.1
+
+# Static Files
+whitenoise==6.6.0
+
+# Utilities
+requests==2.31.0
+python-decouple==3.8
+django-extensions==3.2.3
+
+# Development
+django-cors-headers==4.3.1

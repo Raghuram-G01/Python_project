@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign In - Blog Spot{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .auth-card {
+        backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .floating-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .slide-in {
+        animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-50px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 12px 16px 12px 48px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        transition: color 0.3s ease;
+    }
+
+    .input-field:focus + .input-icon {
+        color: #3b82f6;
+    }
+
+    .success-check {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #10b981;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .input-field.valid + .input-icon + .success-check {
+        opacity: 1;
+    }
+
+    .social-btn {
+        transition: all 0.3s ease;
+        transform: translateY(0);
+    }
+
+    .social-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .illustration {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .illustration::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .kayak-illustration {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="slide-in">
+            <div class="auth-card rounded-3xl p-8 shadow-2xl">
+                <!-- Logo and Header -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+                        <i class="fas fa-blog text-2xl text-white"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Sign in</h1>
+                    <p class="text-gray-600">Welcome back to Blog Spot – Let's sign you in</p>
+                </div>
+
+                    <!-- Form -->
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+
+                        <!-- Username/Email Field -->
+                        <div class="input-group">
+                            {{ form.username }}
+                            <i class="fas fa-user input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="input-group">
+                            {{ form.password }}
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="remember" class="ml-2 text-sm text-gray-600">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="{% url 'users:password_reset' %}" class="text-sm text-blue-600 hover:text-blue-500">
+                                Forgot password?
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                            <div class="flex items-center justify-center">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Sign In
+                            </div>
+                        </button>
+                    </form>
+
+                    <!-- Quick Login for Demo -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="text-center">
+                            <p class="text-sm text-gray-600 mb-4">Quick login for demo:</p>
+                            <div class="space-y-2">
+                                <button type="button" onclick="quickLogin('admin', 'admin123')"
+                                        class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                    <i class="fas fa-user-shield mr-2"></i>Login as Admin
+                                </button>
+                                <button type="button" onclick="quickLogin('john_doe', 'password123')"
+                                        class="w-full bg-green-50 hover:bg-green-100 text-green-700 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                    <i class="fas fa-user mr-2"></i>Login as John Doe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sign Up Link -->
+                    <div class="text-center mt-6">
+                        <p class="text-gray-600">
+                            Don't have an account?
+                            <a href="{% url 'users:register' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                                Sign up here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Style form fields to match design
+    const formFields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+
+    formFields.forEach(field => {
+        field.classList.add('input-field');
+        field.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                this.classList.add('valid');
+            } else {
+                this.classList.remove('valid');
+            }
+        });
+    });
+
+    // Set placeholders
+    const usernameField = document.querySelector('input[name="username"]');
+    const passwordField = document.querySelector('input[name="password"]');
+
+    if (usernameField) {
+        usernameField.placeholder = 'Username or Email';
+    }
+
+    if (passwordField) {
+        passwordField.placeholder = 'Password';
+    }
+});
+
+// Quick login function for demo
+function quickLogin(username, password) {
+    const usernameField = document.querySelector('input[name="username"]');
+    const passwordField = document.querySelector('input[name="password"]');
+
+    if (usernameField && passwordField) {
+        usernameField.value = username;
+        passwordField.value = password;
+
+        // Trigger validation styling
+        usernameField.classList.add('valid');
+        passwordField.classList.add('valid');
+
+        // Submit the form
+        document.querySelector('form').submit();
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign Up - Blog Spot{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .auth-card {
+        backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .floating-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .slide-in {
+        animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-50px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 12px 16px 12px 48px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .input-field:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        transition: color 0.3s ease;
+    }
+
+    .input-field:focus + .input-icon {
+        color: #3b82f6;
+    }
+
+    .success-check {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #10b981;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .input-field.valid + .input-icon + .success-check {
+        opacity: 1;
+    }
+
+    .social-btn {
+        transition: all 0.3s ease;
+        transform: translateY(0);
+    }
+
+    .social-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .illustration {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .illustration::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="slide-in">
+            <div class="auth-card rounded-3xl p-8 shadow-2xl">
+                <!-- Logo and Header -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl mb-4">
+                        <i class="fas fa-blog text-2xl text-white"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Sign up</h1>
+                    <p class="text-gray-600">Welcome to Blog Spot – Let's create account</p>
+                </div>
+
+                    <!-- Form -->
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+
+                        <!-- Name Fields -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="input-group">
+                                {{ form.first_name }}
+                                <i class="fas fa-user input-icon"></i>
+                                <i class="fas fa-check success-check"></i>
+                            </div>
+                            <div class="input-group">
+                                {{ form.last_name }}
+                                <i class="fas fa-user input-icon"></i>
+                                <i class="fas fa-check success-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- Username Field -->
+                        <div class="input-group">
+                            {{ form.username }}
+                            <i class="fas fa-at input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="input-group">
+                            {{ form.email }}
+                            <i class="fas fa-envelope input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="input-group">
+                            {{ form.password1 }}
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="input-group">
+                            {{ form.password2 }}
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-check success-check"></i>
+                        </div>
+
+                        <!-- Privacy Policy -->
+                        <div class="flex items-center">
+                            <input type="checkbox" id="privacy" name="terms" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" required>
+                            <label for="privacy" class="ml-2 text-sm text-gray-600">
+                                I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Privacy & Policy</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+                            <div class="flex items-center justify-center">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Create Account
+                            </div>
+                        </button>
+                    </form>
+
+                    <!-- Sign In Link -->
+                    <div class="text-center mt-6">
+                        <p class="text-gray-600">
+                            Already have an account?
+                            <a href="{% url 'users:login' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Style form fields to match design
+    const formFields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+
+    formFields.forEach(field => {
+        field.classList.add('input-field');
+        field.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                this.classList.add('valid');
+            } else {
+                this.classList.remove('valid');
+            }
+        });
+    });
+
+    // Set placeholders
+    const placeholders = {
+        'first_name': 'First Name',
+        'last_name': 'Last Name',
+        'username': 'Username',
+        'email': 'Email Address',
+        'password1': 'Password',
+        'password2': 'Confirm Password'
+    };
+
+    Object.keys(placeholders).forEach(fieldName => {
+        const field = document.querySelector(`input[name="${fieldName}"]`);
+        if (field) {
+            field.placeholder = placeholders[fieldName];
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Profile - Blog Spot{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Profile</h1>
+        <p class="text-gray-600">Update your account information, profile details, and settings</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="mb-8">
+        <nav class="flex space-x-8" aria-label="Tabs">
+            <button onclick="showTab('account')" id="account-tab" class="tab-button active whitespace-nowrap py-2 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600">
+                <i class="fas fa-user mr-2"></i>Account Information
+            </button>
+            <button onclick="showTab('profile')" id="profile-tab" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                <i class="fas fa-id-card mr-2"></i>Profile Details
+            </button>
+            <a href="{% url 'users:change_password' %}" class="whitespace-nowrap py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                <i class="fas fa-lock mr-2"></i>Change Password
+            </a>
+        </nav>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Account Information Tab -->
+        <div id="account-content" class="tab-content">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-2">Account Information</h2>
+                    <p class="text-gray-600">Update your basic account details</p>
+                </div>
+
+                <!-- Enhanced Profile Picture Section -->
+                <div class="mb-8">
+                    <label class="block text-sm font-medium text-gray-700 mb-4">Profile Picture</label>
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:space-x-8 space-y-6 lg:space-y-0">
+                        <!-- Current Avatar Display -->
+                        <div class="flex-shrink-0">
+                            <div class="relative">
+                                {% if user.profile.avatar %}
+                                    <img id="current-avatar" src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg">
+                                {% else %}
+                                    <div id="current-avatar" class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-4 border-gray-200 shadow-lg">
+                                        <i class="fas fa-user text-3xl text-white"></i>
+                                    </div>
+                                {% endif %}
+                                <!-- Camera Icon Overlay -->
+                                <div class="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer" onclick="document.getElementById('id_avatar').click()">
+                                    <i class="fas fa-camera text-white text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Controls -->
+                        <div class="flex-1">
+                            <div class="space-y-4">
+                                <!-- User Info -->
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ user.get_full_name|default:user.username }}</h3>
+                                    <p class="text-sm text-gray-600">@{{ user.username }}</p>
+                                    <p class="text-xs text-gray-500">Member since {{ user.date_joined|date:"F Y" }}</p>
+                                </div>
+
+                                <!-- Upload Instructions -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <h4 class="text-sm font-medium text-blue-800 mb-2">
+                                        <i class="fas fa-info-circle mr-2"></i>Profile Picture Guidelines
+                                    </h4>
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li>• Recommended size: 400x400 pixels or larger</li>
+                                        <li>• Supported formats: JPG, PNG, GIF</li>
+                                        <li>• Maximum file size: 5MB</li>
+                                        <li>• Square images work best for circular display</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Upload Button -->
+                                <div class="flex space-x-3">
+                                    <button type="button" onclick="document.getElementById('id_avatar').click()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-upload mr-2"></i>Choose New Picture
+                                    </button>
+                                    {% if user.profile.avatar %}
+                                    <button type="button" onclick="removeAvatar()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                                        <i class="fas fa-trash mr-2"></i>Remove Picture
+                                    </button>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Hidden File Input -->
+                                <input type="file" id="id_avatar" name="avatar" accept="image/*" class="hidden" onchange="previewAvatar(this)">
+
+                                <!-- Preview Area -->
+                                <div id="avatar-preview" class="hidden">
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                                        <div class="flex items-center space-x-4">
+                                            <img id="preview-image" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900">New Profile Picture</p>
+                                                <p id="file-info" class="text-xs text-gray-500"></p>
+                                                <button type="button" onclick="cancelPreview()" class="text-xs text-red-600 hover:text-red-700 mt-1">
+                                                    Cancel and choose different image
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{ account_form|crispy }}
+            </div>
+        </div>
+
+        <!-- Profile Details Tab -->
+        <div id="profile-content" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-2">Profile Details</h2>
+                    <p class="text-gray-600">Customize your public profile information</p>
+                </div>
+
+                {{ profile_form|crispy }}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fas fa-save mr-2"></i>Save Changes
+                </button>
+                <a href="{% url 'users:profile' user.username %}" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors font-semibold text-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for Tab Functionality -->
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        content.classList.add('hidden');
+    });
+
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+
+    // Show selected tab content
+    document.getElementById(tabName + '-content').classList.remove('hidden');
+
+    // Add active class to selected tab button
+    const activeButton = document.getElementById(tabName + '-tab');
+    activeButton.classList.add('active', 'border-blue-500', 'text-blue-600');
+    activeButton.classList.remove('border-transparent', 'text-gray-500');
+}
+
+// Initialize with account tab active
+document.addEventListener('DOMContentLoaded', function() {
+    showTab('account');
+});
+
+// Enhanced Profile Picture Functions
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB. Please choose a smaller image.');
+            input.value = '';
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.match('image.*')) {
+            alert('Please select a valid image file (JPG, PNG, GIF).');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Update current avatar preview
+            const currentAvatar = document.getElementById('current-avatar');
+            if (currentAvatar.tagName === 'IMG') {
+                currentAvatar.src = e.target.result;
+            } else {
+                // Replace div with img
+                const newImg = document.createElement('img');
+                newImg.id = 'current-avatar';
+                newImg.src = e.target.result;
+                newImg.alt = '{{ user.username }}';
+                newImg.className = 'w-32 h-32 rounded-full object-cover border-4 border-gray-200 shadow-lg';
+                currentAvatar.parentNode.replaceChild(newImg, currentAvatar);
+            }
+
+            // Show preview section
+            const previewSection = document.getElementById('avatar-preview');
+            const previewImage = document.getElementById('preview-image');
+            const fileInfo = document.getElementById('file-info');
+
+            previewImage.src = e.target.result;
+            fileInfo.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            previewSection.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function cancelPreview() {
+    const input = document.getElementById('id_avatar');
+    const previewSection = document.getElementById('avatar-preview');
+
+    input.value = '';
+    previewSection.classList.add('hidden');
+
+    // Restore original avatar
+    location.reload(); // Simple way to restore original state
+}
+
+function removeAvatar() {
+    if (confirm('Are you sure you want to remove your profile picture?')) {
+        // Create a hidden input to mark avatar for deletion
+        const form = document.querySelector('form');
+        let deleteInput = document.getElementById('delete-avatar');
+        if (!deleteInput) {
+            deleteInput = document.createElement('input');
+            deleteInput.type = 'hidden';
+            deleteInput.name = 'delete_avatar';
+            deleteInput.id = 'delete-avatar';
+            deleteInput.value = 'true';
+            form.appendChild(deleteInput);
+        }
+
+        // Update UI to show default avatar
+        const currentAvatar = document.getElementById('current-avatar');
+        const defaultAvatar = document.createElement('div');
+        defaultAvatar.id = 'current-avatar';
+        defaultAvatar.className = 'w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-4 border-gray-200 shadow-lg';
+        defaultAvatar.innerHTML = '<i class="fas fa-user text-3xl text-white"></i>';
+        currentAvatar.parentNode.replaceChild(defaultAvatar, currentAvatar);
+
+        // Hide remove button
+        const removeBtn = event.target;
+        removeBtn.style.display = 'none';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarContainer = document.getElementById('current-avatar').parentNode;
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        avatarContainer.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop area when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        avatarContainer.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        avatarContainer.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    avatarContainer.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        avatarContainer.classList.add('border-blue-400', 'border-4');
+    }
+
+    function unhighlight(e) {
+        avatarContainer.classList.remove('border-blue-400', 'border-4');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+            const input = document.getElementById('id_avatar');
+            input.files = files;
+            previewAvatar(input);
+        }
+    }
+});
+
+// Form validation feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, textarea, select');
+
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.checkValidity()) {
+                this.classList.remove('border-red-300');
+                this.classList.add('border-green-300');
+            } else {
+                this.classList.remove('border-green-300');
+                this.classList.add('border-red-300');
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.tab-button.active {
+    border-color: #3b82f6;
+    color: #2563eb;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.border-green-300 {
+    border-color: #86efac;
+}
+
+.border-red-300 {
+    border-color: #fca5a5;
+}
+</style>
+{% endblock %}
